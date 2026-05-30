@@ -1,0 +1,9 @@
+boto3
+botocore
+qdrant-client
+sentence-transformers
+python-docx
+openpyxl
+python-pptx
+pydantic
+python-dotenv
