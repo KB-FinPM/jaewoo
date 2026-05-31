@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Optional
 
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams, PointStruct, Filter, FieldCondition, MatchValue
+from qdrant_client.models import Distance, VectorParams, PointStruct, Filter, FieldCondition, MatchValue, FilterSelector
 
 from modules.config import QDRANT_URL, QDRANT_COLLECTION, EMBEDDING_MODEL
 from modules.schemas import RequirementAtom
@@ -62,6 +62,13 @@ class QdrantRequirementStore:
     def search_atoms(self, query: str, limit: int = 20, filters: Optional[Dict[str, Any]] = None) -> List[RequirementAtom]:
         results = self.search(query=query, limit=limit, filters=filters)
         return [RequirementAtom(**item.payload) for item in results if item.payload]
+
+
+    def delete_atoms_by_doc_key(self, doc_key: str):
+        self.client.delete(
+            collection_name=QDRANT_COLLECTION,
+            points_selector=FilterSelector(filter=self._make_filter({'doc_key': doc_key})),
+        )
 
     def scroll_atoms_by_doc_key(self, doc_key: str, limit: int = 500) -> List[RequirementAtom]:
         atoms = []

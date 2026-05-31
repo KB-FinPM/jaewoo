@@ -1,29 +1,13 @@
 from copy import deepcopy
-from datetime import datetime
 from pathlib import Path
-from typing import Dict, List
-import unicodedata
+from typing import Any, Dict, List, Optional
 
 from pptx import Presentation
 from pptx.enum.shapes import MSO_SHAPE_TYPE
 from pptx.oxml.ns import qn
 
+from modules.mapper_loader import build_context, build_placeholder_values, get_value, resolve_path
 from modules.schemas import ScreenPlanItem
-
-
-def _resolve_path(path: str) -> str:
-    """Resolve paths even when Korean filenames are stored as NFD on macOS ZIPs."""
-    p = Path(path)
-    if p.exists():
-        return str(p)
-
-    parent = p.parent if str(p.parent) != '' else Path('.')
-    target = unicodedata.normalize('NFC', p.name)
-    if parent.exists():
-        for candidate in parent.iterdir():
-            if unicodedata.normalize('NFC', candidate.name) == target:
-                return str(candidate)
-    raise FileNotFoundError(f'템플릿 파일을 찾을 수 없습니다: {path}')
 
 
 def _replace_text(text: str, values: Dict[str, str]) -> str:
@@ -32,22 +16,29 @@ def _replace_text(text: str, values: Dict[str, str]) -> str:
     return text
 
 
+def _copy_run_style(source_run, target_run):
+    """Copy the run properties XML so a newly-created run keeps the template font."""
+    source_rpr = source_run._r.get_or_add_rPr()
+    target_rpr = target_run._r.get_or_add_rPr()
+    target_rpr.clear()
+    for child in source_rpr:
+        target_rpr.append(deepcopy(child))
+
+
 def _get_paragraph_end_rpr(paragraph):
-    """빈 셀에 정의된 endParaRPr을 run 서식으로 복사하기 위해 찾는다."""
+    """Return a:endParaRPr from a paragraph. Used when a table cell has no run yet."""
     return paragraph._p.find(qn('a:endParaRPr'))
 
 
 def _apply_rpr_to_run(run, rpr_source):
     """
-    새로 만든 run에는 템플릿 폰트가 자동 적용되지 않을 수 있다.
-    paragraph의 endParaRPr을 a:rPr로 바꿔 run에 직접 붙여준다.
+    Copy paragraph endParaRPr to a newly-created run as a:rPr.
+    Without this, python-pptx may create text with the default Office font.
     """
     if rpr_source is None:
         return
 
     run_element = run._r
-
-    # 기존 rPr이 있으면 제거
     existing_rpr = run_element.find(qn('a:rPr'))
     if existing_rpr is not None:
         run_element.remove(existing_rpr)
@@ -57,13 +48,13 @@ def _apply_rpr_to_run(run, rpr_source):
     run_element.insert(0, copied_rpr)
 
 
-def _set_text_preserve_format(text_frame, new_text: str):
+def _set_text_preserve_format(text_frame, new_text: str, force_paragraph_end_style: bool = False):
     """
-    text_frame.text 또는 cell.text에 직접 대입하면 템플릿 폰트가 초기화될 수 있다.
-    기존 run이 있으면 첫 번째 run의 서식을 유지하고 텍스트만 바꾼다.
+    Set text without using text_frame.text or cell.text so the template font remains.
 
-    Description 표처럼 셀이 비어 있어 run이 없는 경우에는 문단의 endParaRPr
-    정보를 새 run의 rPr로 복사해서 템플릿 폰트가 유지되도록 한다.
+    For Description table cells, the template often has no actual run in empty cells.
+    In that case, copy a:endParaRPr from the paragraph to the new run's a:rPr
+    before writing the text.
     """
     paragraphs = list(text_frame.paragraphs)
     if not paragraphs:
@@ -72,26 +63,24 @@ def _set_text_preserve_format(text_frame, new_text: str):
     first_paragraph = paragraphs[0]
     first_runs = list(first_paragraph.runs)
 
+    end_rpr = _get_paragraph_end_rpr(first_paragraph)
+
     if first_runs:
+        if force_paragraph_end_style and end_rpr is not None:
+            _apply_rpr_to_run(first_runs[0], end_rpr)
         first_runs[0].text = new_text or ''
         for run in first_runs[1:]:
             run.text = ''
     else:
-        end_rpr = _get_paragraph_end_rpr(first_paragraph)
         new_run = first_paragraph.add_run()
         _apply_rpr_to_run(new_run, end_rpr)
         new_run.text = new_text or ''
 
-    # 첫 번째 문단을 제외한 나머지 문단의 텍스트만 비운다.
-    # 문단/런 자체는 유지해서 기존 서식 구조가 최대한 보존되도록 한다.
     for paragraph in paragraphs[1:]:
         for run in list(paragraph.runs):
             run.text = ''
 
-
 def _replace_text_in_text_frame(text_frame, values: Dict[str, str]):
-    # placeholder가 여러 run으로 쪼개져도 전체 문장 기준으로 치환하되,
-    # 텍스트 대입은 run.text만 사용해서 템플릿 폰트를 유지한다.
     original_text = text_frame.text
     replaced_text = _replace_text(original_text, values)
     if replaced_text != original_text:
@@ -124,7 +113,6 @@ def _replace_placeholders_in_slide(slide, values: Dict[str, str]):
 
 def _duplicate_slide(prs, slide_index: int):
     source = prs.slides[slide_index]
-    # 일부 템플릿은 slide_layouts 개수가 적을 수 있으므로 원본 슬라이드의 레이아웃을 사용한다.
     dest = prs.slides.add_slide(source.slide_layout)
 
     for shape in source.shapes:
@@ -141,30 +129,59 @@ def _delete_slide(prs, slide_index: int):
         slide_id_list.remove(slides[slide_index])
 
 
-def _fill_description_table(slide, item: ScreenPlanItem):
-    # The screen template has two tables. The Description table is the one with 11 rows and 2 columns.
-    description_tables = []
-    for shape in slide.shapes:
-        if not getattr(shape, 'has_table', False):
-            continue
-        table = shape.table
-        if len(table.columns) >= 2 and len(table.rows) >= 2:
-            first_cell_text = table.cell(0, 0).text.strip()
-            if first_cell_text == 'Description' or len(table.rows) >= 11:
-                description_tables.append(table)
+def _iter_tables_from_shapes(shapes):
+    for shape in shapes:
+        if getattr(shape, 'has_table', False):
+            yield shape.table
+        if getattr(shape, 'shape_type', None) == MSO_SHAPE_TYPE.GROUP:
+            yield from _iter_tables_from_shapes(shape.shapes)
 
-    if not description_tables:
+
+def _find_description_table(slide, table_mapper: Dict[str, Any]):
+    header_text = str(table_mapper.get('header_text', '')).strip()
+    min_rows = int(table_mapper.get('min_rows', 2))
+    min_columns = int(table_mapper.get('min_columns', 2))
+
+    candidates = []
+    for table in _iter_tables_from_shapes(slide.shapes):
+        if len(table.rows) < min_rows or len(table.columns) < min_columns:
+            continue
+        first_cell_text = table.cell(0, 0).text.strip()
+        if not header_text or first_cell_text == header_text:
+            candidates.append(table)
+
+    if candidates:
+        return candidates[-1]
+    return None
+
+
+def _format_display_item(display_item: Any, text_format: str) -> str:
+    item_name = str(get_value(display_item, 'item_name') or '')
+    description = str(get_value(display_item, 'description') or '')
+    return text_format.replace('{item_name}', item_name).replace('{description}', description).strip(': ')
+
+
+def _fill_description_table(slide, item: ScreenPlanItem, table_mapper: Dict[str, Any]):
+    table = _find_description_table(slide, table_mapper)
+    if table is None:
         return
 
-    table = description_tables[-1]
-    for row_idx in range(1, min(len(table.rows), 11)):
-        _set_text_preserve_format(table.cell(row_idx, 1).text_frame, '')
+    start_row = int(table_mapper.get('start_row', 1))
+    target_column = int(table_mapper.get('target_column', 1))
+    max_items = int(table_mapper.get('max_items', 10))
+    text_format = table_mapper.get('text_format', '{item_name}: {description}')
 
-    for idx, display_item in enumerate(item.display_items[:10], start=1):
-        if idx >= len(table.rows):
+    if table_mapper.get('clear_rows_before_fill', True):
+        for row_idx in range(start_row, min(len(table.rows), start_row + max_items)):
+            _set_text_preserve_format(table.cell(row_idx, target_column).text_frame, '', force_paragraph_end_style=True)
+
+    display_items = get_value(item, table_mapper.get('display_items_field', 'display_items')) or []
+    for offset, display_item in enumerate(display_items[:max_items]):
+        row_idx = start_row + offset
+        if row_idx >= len(table.rows):
             break
-        description_text = f'{display_item.item_name}: {display_item.description}'.strip(': ')
-        _set_text_preserve_format(table.cell(idx, 1).text_frame, description_text)
+        description_text = _format_display_item(display_item, text_format)
+        _set_text_preserve_format(table.cell(row_idx, target_column).text_frame, description_text, force_paragraph_end_style=True)
 
 
 def save_screen_plan_ppt(
@@ -173,35 +190,56 @@ def save_screen_plan_ppt(
     output_path: str,
     project_name: str,
     author: str,
+    mapper: Optional[Dict[str, Any]] = None,
 ):
-    prs = Presentation(_resolve_path(template_path))
-    today = datetime.today().strftime('%Y-%m-%d')
-
-    common_values = {
-        '{프로젝트명}': project_name,
-        '{작성자명}': author,
-        '{작성자}': author,
-        '{작성일}': today,
+    mapper = mapper or {
+        'template_path': template_path,
+        'common_slide_indices': [0, 1],
+        'template_slide_index': 2,
+        'placeholder_slides': {
+            'common': {'{프로젝트명}': 'project_name', '{작성자명}': 'author', '{작성자}': 'author', '{작성일}': 'today'},
+            'screen_item': {
+                '{요구사항ID}': 'requirement_id',
+                '{화면ID}': 'screen_id|screen_no',
+                '{화면번호}': 'screen_no',
+                '{화면명}': 'screen_name',
+                '{서브시스템명}': '',
+                '{메뉴위치}': '',
+            },
+        },
+        'description_table': {
+            'header_text': 'Description',
+            'min_rows': 11,
+            'min_columns': 2,
+            'start_row': 1,
+            'target_column': 1,
+            'max_items': 10,
+            'display_items_field': 'display_items',
+            'text_format': '{item_name}: {description}',
+        },
     }
 
-    for slide_index in [0, 1]:
+    prs = Presentation(resolve_path(mapper.get('template_path') or template_path))
+    context = build_context(project_name, author)
+
+    common_values = build_placeholder_values(
+        mapper.get('placeholder_slides', {}).get('common', {}),
+        source=None,
+        context=context,
+    )
+    for slide_index in mapper.get('common_slide_indices', [0, 1]):
         if slide_index < len(prs.slides):
             _replace_placeholders_in_slide(prs.slides[slide_index], common_values)
 
-    template_slide_index = 2
+    template_slide_index = int(mapper.get('template_slide_index', 2))
+    screen_placeholders = mapper.get('placeholder_slides', {}).get('screen_item', {})
+    table_mapper = mapper.get('description_table', {})
+
     for item in items:
         slide = _duplicate_slide(prs, template_slide_index)
-        screen_id = item.screen_id or item.screen_no
-        item_values = {
-            '{요구사항ID}': item.requirement_id,
-            '{화면ID}': screen_id,
-            '{화면번호}': item.screen_no,
-            '{화면명}': item.screen_name,
-            '{서브시스템명}': '',
-            '{메뉴위치}': '',
-        }
+        item_values = build_placeholder_values(screen_placeholders, source=item, context=context)
         _replace_placeholders_in_slide(slide, item_values)
-        _fill_description_table(slide, item)
+        _fill_description_table(slide, item, table_mapper)
 
     _delete_slide(prs, template_slide_index)
 

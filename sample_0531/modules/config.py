@@ -21,6 +21,7 @@ AUTHOR_NAME = os.getenv('AUTHOR_NAME', '작성자')
 REQUIREMENT_TEMPLATE_PATH = os.getenv('REQUIREMENT_TEMPLATE_PATH', 'template/탬플릿_요구사항명세서.xlsx')
 WBS_TEMPLATE_PATH = os.getenv('WBS_TEMPLATE_PATH', 'template/탬플릿_WBS.xlsx')
 SCREEN_TEMPLATE_PATH = os.getenv('SCREEN_TEMPLATE_PATH', 'template/탬플릿_화면설계서.pptx')
+OUTPUT_MAPPER_PATH = os.getenv('OUTPUT_MAPPER_PATH', 'template/output_mapper.json')
 
 if not MODEL_ID:
     raise ValueError('MODEL_ID가 .env에 설정되어 있지 않습니다.')
