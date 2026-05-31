@@ -1,0 +1,8 @@
+{
+  "file_path": "result.txt",
+  "mtime": 1778421216.5677407,
+  "size": 2309653,
+  "chunk_size": 700,
+  "chunk_overlap": 120,
+  "embed_model": "jhgan/ko-sroberta-multitask"
+}

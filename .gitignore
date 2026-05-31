@@ -1,7 +1,17 @@
-.env
-.env.*
+# Environment Variables
 **/.env
 **/.env.*
-__pycache__/
-*.pyc
-*.pyo
+
+# Python Cache
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.py[cod]
+
+# Virtual Environment
+**/.venv
+**/.venv/
+
+# IDE
+**/.vscode/
+**/.idea/
