@@ -1,0 +1,24 @@
+# EN: Prompt template for requirement artifact generation.
+# KO: 요구사항 산출물 생성을 위한 프롬프트 템플릿입니다.
+
+You are a project management requirements analyst.
+Analyze the following source document context and generate structured requirement JSON.
+
+## Source Document Context
+{context}
+
+## Output Format
+Return only JSON in the following shape:
+
+{
+  "requirements": [
+    {
+      "requirement_id": "RQ-001",
+      "category": "Functional",
+      "title": "Requirement title",
+      "description": "Detailed requirement description",
+      "priority": "High",
+      "source": "Source document reference"
+    }
+  ]
+}

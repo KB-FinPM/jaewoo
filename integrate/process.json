@@ -1,0 +1,78 @@
+{
+  "version": "1.0",
+  "description": "PM Agent 실행 프로세스 설정. enabled 값을 조정하면 소스 수정 없이 산출물 생성 여부를 제어할 수 있습니다.",
+  "input": {
+    "document_parser_agent": {
+      "enabled": true,
+      "input_dir": "input",
+      "base_name": "구축요건정의서",
+      "version_pattern": "{base_name}.v.{version}.docx",
+      "version_type": "integer_highest",
+      "instruction_md": "app/agents/input_agents/document_parser_agent/AGENT.md"
+    }
+  },
+  "core_agents": {
+    "requirement_agent": {
+      "enabled": true,
+      "description": "구축요건정의서를 분석하여 요구사항 atom을 생성합니다. WBS/화면기획서 생성을 위해 내부적으로 필요합니다.",
+      "instruction_md": "app/agents/core_agents/requirement_agent/AGENT.md"
+    },
+    "wbs_agent": {
+      "enabled": true,
+      "depends_on": [
+        "requirement_agent"
+      ],
+      "rag_purpose": "WBS 개발 작업 분해",
+      "limit_per_domain": 25,
+      "instruction_md": "app/agents/core_agents/wbs_agent/AGENT.md"
+    },
+    "storyboard_agent": {
+      "enabled": true,
+      "depends_on": [
+        "requirement_agent"
+      ],
+      "rag_purpose": "화면기획 UI 화면 표시 항목",
+      "limit_per_domain": 25,
+      "instruction_md": "app/agents/core_agents/storyboard_agent/AGENT.md"
+    }
+  },
+  "output_agents": {
+    "requirement_spec": {
+      "enabled": true,
+      "agent": "excel_writer",
+      "core_data": "requirements",
+      "mapper_section": "requirement_spec",
+      "instruction_md": "app/agents/output_agents/requirement_spec_agent/AGENT.md"
+    },
+    "wbs": {
+      "enabled": true,
+      "agent": "excel_writer",
+      "core_data": "wbs_items",
+      "mapper_section": "wbs",
+      "instruction_md": "app/agents/output_agents/wbs_output_agent/AGENT.md"
+    },
+    "screen_plan": {
+      "enabled": true,
+      "agent": "ppt_writer",
+      "core_data": "screen_items",
+      "mapper_section": "screen_plan",
+      "instruction_md": "app/agents/output_agents/screen_plan_agent/AGENT.md"
+    },
+    "markdown_summary": {
+      "enabled": false,
+      "agent": "markdown_agent",
+      "core_data": "all",
+      "document_name": "분석요약",
+      "extension": ".md",
+      "instruction_md": "app/agents/output_agents/markdown_agent/AGENT.md"
+    }
+  },
+  "rag": {
+    "enabled": true,
+    "vector_store": "qdrant",
+    "qdrant_url_env": "QDRANT_URL",
+    "collection_env": "QDRANT_COLLECTION",
+    "embedding_model_env": "EMBEDDING_MODEL",
+    "start_command": "docker compose up -d qdrant"
+  }
+}
