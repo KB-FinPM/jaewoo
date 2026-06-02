@@ -4,7 +4,7 @@ from typing import List
 from app.core.agent_instruction import load_agent_instruction
 from app.core.bedrock_client import invoke_bedrock
 from app.core.json_utils import clean_json_response, repair_json_array, safe_json_loads
-from app.schemas.pm_artifacts import RequirementAtom, SemanticChunk
+from app.schemas.artifact import RequirementAtom, SemanticChunk
 from app.storage.version_manager import DocumentVersionInfo
 
 

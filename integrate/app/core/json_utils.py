@@ -1,7 +1,7 @@
 import json
 
 from app.core.bedrock_client import invoke_bedrock
-from app.core.pm_logger import log_info
+from app.core.logger import log_info
 
 
 def clean_json_response(raw: str) -> str:
@@ -27,6 +27,8 @@ def safe_json_loads(raw: str, error_label: str):
 
 
 def repair_json_array(raw: str, label: str, max_tokens: int = 4000):
+    # JSON 원문은 절단하지 않습니다. 중간 절단 시 객체/배열이 깨져 파싱 오류가 발생합니다.
+    effective_max_tokens = int(max_tokens or 4000)
     repair_prompt = f'''
 아래 텍스트는 잘리거나 깨진 JSON 배열이다.
 
@@ -39,7 +41,7 @@ def repair_json_array(raw: str, label: str, max_tokens: int = 4000):
 텍스트:
 {raw}
 '''
-    repaired = invoke_bedrock(system_prompt='너는 JSON 복구기다. JSON 배열 외 설명은 절대 출력하지 않는다.', user_prompt=repair_prompt, max_tokens=max_tokens).strip()
+    repaired = invoke_bedrock(system_prompt='너는 JSON 복구기다. JSON 배열 외 설명은 절대 출력하지 않는다.', user_prompt=repair_prompt, max_tokens=effective_max_tokens).strip()
     try:
         return safe_json_loads(repaired, f'{label} JSON 복구')
     except json.JSONDecodeError:

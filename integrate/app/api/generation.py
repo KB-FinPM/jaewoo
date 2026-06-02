@@ -12,11 +12,12 @@ from app.dependencies import (
 )
 from app.rag.retrieval import RetrievalService
 from app.schemas.artifact import ArtifactType
-from app.schemas.request import GenerationRequest
-from app.schemas.response import GenerationResponse
+from app.schemas.request import GenerationRequest, PMArtifactGenerationRequest
+from app.schemas.response import GenerationResponse, PMArtifactGenerationResponse
 from app.services.artifact_service import ArtifactService
 from app.services.generation_service import GenerationService
 from app.services.template_service import TemplateService
+from app.orchestrator.generation_orchestrator import run_pm_pipeline
 
 logger = get_logger(__name__)
 router = APIRouter()
@@ -92,3 +93,20 @@ async def generate_action_items(request: GenerationRequest) -> GenerationRespons
         project_id=request.project_id,
         result={"mock": "Action item extraction result"},
     )
+
+
+# PM artifact generation endpoint
+# 기존 app/api/pm_artifacts.py의 라우터를 generation API로 통합했습니다.
+@router.post("/pm-artifacts", response_model=PMArtifactGenerationResponse)
+def generate_pm_artifacts(request: PMArtifactGenerationRequest) -> PMArtifactGenerationResponse:
+    logger.info(f"generate_pm_artifacts | project_name={request.project_name}")
+    generated = run_pm_pipeline(
+        docx_path=request.docx_path,
+        output_dir=request.output_dir,
+        recreate_collection=request.recreate_collection,
+        project_name=request.project_name,
+        author=request.author,
+        mapper_path=request.mapper_path,
+        process_path=request.process_path,
+    )
+    return PMArtifactGenerationResponse(generated=generated)

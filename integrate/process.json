@@ -1,6 +1,7 @@
 {
   "version": "1.0",
   "description": "PM Agent 실행 프로세스 설정. enabled 값을 조정하면 소스 수정 없이 산출물 생성 여부를 제어할 수 있습니다.",
+  "max_token": 1000,
   "input": {
     "document_parser_agent": {
       "enabled": true,
@@ -23,7 +24,7 @@
         "requirement_agent"
       ],
       "rag_purpose": "WBS 개발 작업 분해",
-      "limit_per_domain": 25,
+      "limit_per_domain": 5,
       "instruction_md": "app/agents/core_agents/wbs_agent/AGENT.md"
     },
     "storyboard_agent": {
@@ -32,7 +33,7 @@
         "requirement_agent"
       ],
       "rag_purpose": "화면기획 UI 화면 표시 항목",
-      "limit_per_domain": 25,
+      "limit_per_domain": 5,
       "instruction_md": "app/agents/core_agents/storyboard_agent/AGENT.md"
     }
   },

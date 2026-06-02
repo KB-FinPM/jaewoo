@@ -1,7 +1,7 @@
 from typing import List, Dict
 
 from app.rag.qdrant_store import QdrantRequirementStore
-from app.schemas.pm_artifacts import RequirementAtom
+from app.schemas.artifact import RequirementAtom
 
 
 def unique_domains(atoms: List[RequirementAtom]) -> List[str]:

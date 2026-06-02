@@ -2,7 +2,7 @@ from typing import List
 
 from app.rag.qdrant_store import QdrantRequirementStore
 from app.rag.rag_service import build_domain_contexts
-from app.schemas.pm_artifacts import RequirementAtom, ScreenPlanItem
+from app.schemas.artifact import RequirementAtom, ScreenPlanItem
 from app.agents.core_agents.storyboard_agent.planner import generate_screen_plan_items_from_rag
 
 

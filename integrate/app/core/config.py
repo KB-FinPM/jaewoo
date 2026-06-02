@@ -7,29 +7,7 @@ from typing import List
 
 
 class Settings(BaseSettings):
-
-    model_id: str = "apac.anthropic.claude-sonnet-4-20250514-v1:0"
-
-    qdrant_url: str = "http://localhost:6333"
-    qdrant_collection: str = "pm_requirement_atoms"
-    embedding_model: str = "BAAI/bge-m3"
-
-    chunk_max_chars: int = 1200
-    chunk_overlap_chars: int = 150
-
-    wbs_batch_size: int = 10
-    screen_batch_size: int = 10
-
-    bedrock_read_timeout: int = 300
-    recreate_collection: bool = False
-
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        extra="ignore"
-    )
-
-    # model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     # 앱
     APP_ENV: str = "development"
@@ -49,6 +27,26 @@ class Settings(BaseSettings):
 
     # Bedrock
     BEDROCK_MODEL_ID: str = "anthropic.claude-sonnet-4-5"
+
+
+    # PM artifact generation / RAG integration
+    # 기존 분리 파일(app/core/pm_config.py)의 설정을 backend 표준 config로 흡수했습니다.
+    MODEL_ID: str = "apac.anthropic.claude-sonnet-4-20250514-v1:0"
+    QDRANT_URL: str = "http://localhost:6333"
+    QDRANT_COLLECTION: str = "pm_requirement_atoms"
+    EMBEDDING_MODEL: str = "BAAI/bge-m3"
+    CHUNK_MAX_CHARS: int = 1200
+    CHUNK_OVERLAP_CHARS: int = 150
+    WBS_BATCH_SIZE: int = 10
+    SCREEN_BATCH_SIZE: int = 10
+    BEDROCK_READ_TIMEOUT: int = 300
+    RECREATE_COLLECTION: bool = False
+    PROJECT_NAME: str = "프로젝트명"
+    AUTHOR_NAME: str = "작성자"
+    REQUIREMENT_TEMPLATE_PATH: str = "template/탬플릿_요구사항명세서.xlsx"
+    WBS_TEMPLATE_PATH: str = "template/탬플릿_WBS.xlsx"
+    SCREEN_TEMPLATE_PATH: str = "template/탬플릿_화면설계서.pptx"
+    OUTPUT_MAPPER_PATH: str = "template/output_mapper.json"
 
     # DB (Aurora PostgreSQL)
     DATABASE_URL: str = "sqlite+aiosqlite:///./finpm.db"  # 로컬 개발용 SQLite
@@ -70,3 +68,24 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+# PM artifact generation compatibility aliases
+# 기존 pm_config.py에 있던 상수를 backend 표준 Settings에서 노출합니다.
+AWS_REGION = settings.AWS_REGION
+MODEL_ID = settings.MODEL_ID
+QDRANT_URL = settings.QDRANT_URL
+QDRANT_COLLECTION = settings.QDRANT_COLLECTION
+EMBEDDING_MODEL = settings.EMBEDDING_MODEL
+CHUNK_MAX_CHARS = settings.CHUNK_MAX_CHARS
+CHUNK_OVERLAP_CHARS = settings.CHUNK_OVERLAP_CHARS
+WBS_BATCH_SIZE = settings.WBS_BATCH_SIZE
+SCREEN_BATCH_SIZE = settings.SCREEN_BATCH_SIZE
+BEDROCK_READ_TIMEOUT = settings.BEDROCK_READ_TIMEOUT
+RECREATE_COLLECTION = settings.RECREATE_COLLECTION
+PROJECT_NAME = settings.PROJECT_NAME
+AUTHOR_NAME = settings.AUTHOR_NAME
+REQUIREMENT_TEMPLATE_PATH = settings.REQUIREMENT_TEMPLATE_PATH
+WBS_TEMPLATE_PATH = settings.WBS_TEMPLATE_PATH
+SCREEN_TEMPLATE_PATH = settings.SCREEN_TEMPLATE_PATH
+OUTPUT_MAPPER_PATH = settings.OUTPUT_MAPPER_PATH

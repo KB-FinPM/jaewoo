@@ -12,7 +12,6 @@ from app.api import (
     templates,
     traceability,
     upload,
-    pm_artifacts,
 )
 from app.core.config import settings
 
@@ -38,4 +37,3 @@ app.include_router(artifacts.router, tags=["artifacts"])
 app.include_router(templates.router, tags=["templates"])
 app.include_router(traceability.router, tags=["traceability"])
 
-app.include_router(pm_artifacts.router, prefix="/generate", tags=["pm-artifacts"])

@@ -26,3 +26,9 @@ class GenerationResponse(BaseResponse):
 
 class DocumentUploadResponse(BaseResponse):
     document: DocumentMetadata
+
+
+# PM artifact generation response
+# PM 산출물 생성 API의 파일 경로 응답 스키마입니다.
+class PMArtifactGenerationResponse(BaseResponse):
+    generated: dict[str, str] = Field(default_factory=dict)

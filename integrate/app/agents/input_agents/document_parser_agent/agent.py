@@ -5,13 +5,13 @@ from pathlib import PurePath
 
 from typing import List
 
-from app.core.pm_config import CHUNK_MAX_CHARS, CHUNK_OVERLAP_CHARS
-from app.rag.pm_chunking import make_id, semantic_chunk
+from app.core.config import CHUNK_MAX_CHARS, CHUNK_OVERLAP_CHARS
+from app.rag.chunking import make_id, semantic_chunk
 from app.storage.docx_reader import read_docx_text
 from app.agents.input_agents.document_parser_agent.extractor import extract_requirement_atoms
-from app.core.pm_logger import log_info, log_step
+from app.core.logger import log_info, log_step
 from app.rag.qdrant_store import QdrantRequirementStore
-from app.schemas.pm_artifacts import RequirementAtom
+from app.schemas.artifact import RequirementAtom
 from app.storage.version_manager import (
     build_doc_version_info,
     get_saved_document_info,

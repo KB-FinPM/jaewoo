@@ -26,3 +26,17 @@ def get_logger(name: str) -> logging.Logger:
     logger.addHandler(handler)
 
     return logger
+
+
+# PM artifact generation step logger
+# 기존 pm_logger.py의 간단한 단계 로그 함수를 backend 공통 logger에 통합했습니다.
+from datetime import datetime
+
+def now_text() -> str:
+    return datetime.now().strftime("%H:%M:%S")
+
+def log_step(message: str) -> None:
+    get_logger("pm_pipeline").info(f"[{now_text()}] {message}")
+
+def log_info(message: str) -> None:
+    get_logger("pm_pipeline").info(f"[{now_text()}] {message}")

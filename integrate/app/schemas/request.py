@@ -5,6 +5,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, model_validator
 
+from app.core.config import AUTHOR_NAME, OUTPUT_MAPPER_PATH, PROJECT_NAME, RECREATE_COLLECTION
+
 from app.schemas.artifact import (
     ArtifactType,
     DocumentType,
@@ -73,3 +75,15 @@ class GenerationRequest(BaseModel):
                 template_version=self.template_version,
             ),
         )
+
+
+# PM artifact generation request
+# 기존 app/api/pm_artifacts.py에 있던 요청 모델을 공통 request schema로 이동했습니다.
+class PMArtifactGenerationRequest(BaseModel):
+    docx_path: Optional[str] = Field(default=None, description="분석할 DOCX 경로. None이면 input/구축요건정의서.v.#.docx 중 최신 버전 사용")
+    output_dir: str = "output"
+    recreate_collection: bool = RECREATE_COLLECTION
+    project_name: str = PROJECT_NAME
+    author: str = AUTHOR_NAME
+    mapper_path: str = OUTPUT_MAPPER_PATH
+    process_path: str = "process.json"

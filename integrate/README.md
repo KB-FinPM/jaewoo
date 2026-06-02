@@ -960,16 +960,14 @@ app/core/mapper_loader.py
 ```bash
 docker compose up -d qdrant
 python run_pm_pipeline.py --project-name "프로젝트명" --author "작성자"
-```
 
-## API 실행
-
-```bash
-uvicorn app.main:app --reload
-```
-
-```text
-POST /generate/pm-artifacts
+또는 API 호출
+curl -X POST "http://localhost:8000/generate/pm-artifacts" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "project_name": "테스트 프로젝트",
+    "author": "홍길동"
+  }'
 ```
 
 ## 설정 파일
@@ -985,3 +983,17 @@ docker compose up -d qdrant
 docker compose ps
 docker compose down
 ```
+
+## PM 산출물 토큰 제한
+
+`process.json`의 `max_token` 값은 최종 산출물 파일에 기록되는 텍스트에만 적용합니다.
+JSON 형태의 Bedrock 응답/복구 원문은 파싱 오류 방지를 위해 제한하지 않습니다.
+
+```json
+{
+  "version": "1.0",
+  "description": "...",
+  "max_token": 1000
+}
+```
+

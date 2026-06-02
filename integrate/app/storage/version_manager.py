@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
-from app.schemas.pm_artifacts import RequirementAtom
+from app.schemas.artifact import RequirementAtom
 
 
 @dataclass

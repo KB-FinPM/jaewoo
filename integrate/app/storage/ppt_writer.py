@@ -7,12 +7,13 @@ from pptx.enum.shapes import MSO_SHAPE_TYPE
 from pptx.oxml.ns import qn
 
 from app.core.mapper_loader import build_context, build_placeholder_values, get_value, resolve_path
-from app.schemas.pm_artifacts import ScreenPlanItem
+from app.core.token_limiter import limit_output_text
+from app.schemas.artifact import ScreenPlanItem
 
 
 def _replace_text(text: str, values: Dict[str, str]) -> str:
     for key, value in values.items():
-        text = text.replace(key, value or '')
+        text = text.replace(key, limit_output_text(value or ''))
     return text
 
 
@@ -68,13 +69,13 @@ def _set_text_preserve_format(text_frame, new_text: str, force_paragraph_end_sty
     if first_runs:
         if force_paragraph_end_style and end_rpr is not None:
             _apply_rpr_to_run(first_runs[0], end_rpr)
-        first_runs[0].text = new_text or ''
+        first_runs[0].text = limit_output_text(new_text or '')
         for run in first_runs[1:]:
             run.text = ''
     else:
         new_run = first_paragraph.add_run()
         _apply_rpr_to_run(new_run, end_rpr)
-        new_run.text = new_text or ''
+        new_run.text = limit_output_text(new_text or '')
 
     for paragraph in paragraphs[1:]:
         for run in list(paragraph.runs):

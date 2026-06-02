@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from app.core.agent_instruction import load_agent_instruction
+from app.core.token_limiter import limit_output_text
 
 
 class MarkdownSummaryAgent:
@@ -28,4 +29,4 @@ class MarkdownSummaryAgent:
             lines.append(f'- {getattr(atom, "requirement_id", "")}: {getattr(atom, "requirement_name", "")}')
 
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-        Path(output_path).write_text('\n'.join(lines), encoding='utf-8')
+        Path(output_path).write_text(limit_output_text('\n'.join(lines)), encoding='utf-8')

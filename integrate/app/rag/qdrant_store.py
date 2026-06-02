@@ -1,8 +1,8 @@
 import uuid
 from typing import Any, Dict, List, Optional
 
-from app.core.pm_config import EMBEDDING_MODEL, QDRANT_COLLECTION, QDRANT_URL
-from app.schemas.pm_artifacts import RequirementAtom
+from app.core.config import EMBEDDING_MODEL, QDRANT_COLLECTION, QDRANT_URL
+from app.schemas.artifact import RequirementAtom
 
 
 class QdrantRequirementStore:

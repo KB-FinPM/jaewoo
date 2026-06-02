@@ -1,7 +1,7 @@
 import argparse
 
-from app.core.pm_config import AUTHOR_NAME, OUTPUT_MAPPER_PATH, PROJECT_NAME, RECREATE_COLLECTION
-from app.orchestrator.pm_pipeline import run_pipeline
+from app.core.config import AUTHOR_NAME, OUTPUT_MAPPER_PATH, PROJECT_NAME, RECREATE_COLLECTION
+from app.orchestrator.generation_orchestrator import run_pm_pipeline
 
 
 def parse_args():
@@ -18,7 +18,7 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    run_pipeline(
+    run_pm_pipeline(
         docx_path=args.docx,
         output_dir=args.output_dir,
         recreate_collection=args.recreate_collection,

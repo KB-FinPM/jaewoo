@@ -3,7 +3,7 @@ from typing import List
 from app.rag.rag_service import build_domain_contexts
 from app.agents.core_agents.wbs_agent.generator import generate_wbs_items_from_rag
 from app.rag.qdrant_store import QdrantRequirementStore
-from app.schemas.pm_artifacts import RequirementAtom, WBSItem
+from app.schemas.artifact import RequirementAtom, WBSItem
 
 
 class WBSAgent:

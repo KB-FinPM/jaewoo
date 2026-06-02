@@ -5,7 +5,8 @@ from openpyxl import load_workbook
 from openpyxl.cell.cell import MergedCell
 
 from app.core.mapper_loader import build_context, build_placeholder_values, get_value, resolve_path
-from app.schemas.pm_artifacts import RequirementAtom, WBSItem
+from app.core.token_limiter import limit_output_text
+from app.schemas.artifact import RequirementAtom, WBSItem
 
 
 def _replace_placeholders(ws, values: Dict[str, str]):
@@ -16,7 +17,7 @@ def _replace_placeholders(ws, values: Dict[str, str]):
             text = cell.value
             for key, value in values.items():
                 text = text.replace(key, value or '')
-            cell.value = text
+            cell.value = limit_output_text(text)
 
 
 def _header_map(ws, header_row: int = 1) -> Dict[str, int]:
@@ -92,7 +93,7 @@ def _write_data_sheet(wb, items: List[Any], data_mapper: Dict[str, Any], context
         for col_no, column_mapper in resolved_columns:
             field_expr = column_mapper.get('field', '')
             value = get_value(item, field_expr, context=context, row_number=row_number)
-            ws.cell(row=excel_row, column=col_no).value = value
+            ws.cell(row=excel_row, column=col_no).value = limit_output_text(value)
 
 
 def save_requirement_excel(

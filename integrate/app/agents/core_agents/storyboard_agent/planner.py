@@ -4,8 +4,8 @@ from typing import Dict, List
 from app.core.agent_instruction import load_agent_instruction
 from app.core.bedrock_client import invoke_bedrock
 from app.core.json_utils import clean_json_response, repair_json_array, safe_json_loads
-from app.core.pm_logger import log_info
-from app.schemas.pm_artifacts import RequirementAtom, ScreenDisplayItem, ScreenPlanItem
+from app.core.logger import log_info
+from app.schemas.artifact import RequirementAtom, ScreenDisplayItem, ScreenPlanItem
 
 
 BASE_SYSTEM_PROMPT = '너는 PM Agent의 화면기획서 생성기다.'
