@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "description": "PM Agent 산출물 생성 프로세스 설정",
+  "_comment_max_token": "최종 산출물 파일에 입력되는 긴 텍스트를 제한하는 근사 토큰 수입니다. JSON 응답/복구에는 적용하지 않습니다.",
+  "max_token": 1000,
+  "project_type": "auto",
+  "limit_per_domain": 25,
+  "steps": [
+    {
+      "id": "requirement_spec",
+      "name": "요구사항명세서 생성",
+      "enabled": true,
+      "agent": "requirement_agent",
+      "instruction_md": "agents/requirement_agent/AGENT.md"
+    },
+    {
+      "id": "wbs",
+      "name": "WBS 생성",
+      "enabled": true,
+      "agent": "wbs_agent",
+      "instruction_md": "agents/wbs_agent/AGENT.md"
+    },
+    {
+      "id": "screen_plan",
+      "name": "화면기획서 생성",
+      "enabled": true,
+      "agent": "storyboard_agent",
+      "instruction_md": "agents/storyboard_agent/AGENT.md"
+    }
+  ]
+}

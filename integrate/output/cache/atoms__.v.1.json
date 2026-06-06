@@ -1,0 +1,92 @@
+[
+  {
+    "requirement_id": "REQ-0001",
+    "category": "기능",
+    "requirement_name": "OCP 플랫폼 구축",
+    "requirement_type": "기능요구사항",
+    "domain": "아키텍쳐",
+    "feature": "시스템 아키텍쳐 설계",
+    "description": "서비스별 독립성과 확장 유연성을 가진 OCP 플랫폼을 구축하고, 기존 JSP 화면과 JAVA 업무영역을 PaaS로 설계",
+    "note": "비대면 아키텍쳐 재설계",
+    "source_doc": "구축요건정의서.v.1.docx",
+    "source_chunk_id": "a598808c491dcdcc",
+    "source_section_path": [
+      "ROOT"
+    ],
+    "raw_text": "2.3.3 개발 상세 내용\n- 비대면 아키텍쳐 재설계 및 인프라 구축\n기능구분 | 주요내용 | 상세\n아키텍쳐 설계 | 시스템 아키텍쳐 설계 | - 서비스별 독립성, 확장 유연성을 가질 수 있는 OCP 플랫폼 구축 - 기존 화면 액션(JSP) 및 업무 개발영역(JAVA)을 PaaS 로 설계\n아키텍쳐 설계 | 대용량 아키텍쳐 설계 | - 대용량 수용가능 아키텍처 필요하며 시스템 사용자 증가에 대비한 아키텍쳐 설계\n모니터링 | 시스템 모니터링 | - OCP클러스터 內 Prometheus 주7) 를 활용하여 클러스터 상태, 노드 리소스 등 모니터링\n모니터링 | 실시간 MSA 거래 추적 기능 적용 | - Service Mesh(istio)주9)를 적용하여 Kiali 주10), Jaeger주11)를 통한 서비스 트래픽 및 성능 모니터링 시각화\n시스템 연계 | 외부 연계시 내부API  G/W, EAI 활용 | - 코어뱅킹(상품 처리계 등), 금융복합플랫폼 연계시 전행표준인 내부API G/W or EAI를 통해 연계",
+    "doc_key": "구축요건정의서.v.1",
+    "doc_version": "1"
+  },
+  {
+    "requirement_id": "REQ-0002",
+    "category": "비기능",
+    "requirement_name": "대용량 아키텍쳐 설계",
+    "requirement_type": "비기능요구사항",
+    "domain": "아키텍쳐",
+    "feature": "대용량 처리",
+    "description": "대용량 수용가능한 아키텍처 구축 및 시스템 사용자 증가에 대비한 확장성 있는 아키텍쳐 설계",
+    "note": "성능 및 확장성",
+    "source_doc": "구축요건정의서.v.1.docx",
+    "source_chunk_id": "a598808c491dcdcc",
+    "source_section_path": [
+      "ROOT"
+    ],
+    "raw_text": "2.3.3 개발 상세 내용\n- 비대면 아키텍쳐 재설계 및 인프라 구축\n기능구분 | 주요내용 | 상세\n아키텍쳐 설계 | 시스템 아키텍쳐 설계 | - 서비스별 독립성, 확장 유연성을 가질 수 있는 OCP 플랫폼 구축 - 기존 화면 액션(JSP) 및 업무 개발영역(JAVA)을 PaaS 로 설계\n아키텍쳐 설계 | 대용량 아키텍쳐 설계 | - 대용량 수용가능 아키텍처 필요하며 시스템 사용자 증가에 대비한 아키텍쳐 설계\n모니터링 | 시스템 모니터링 | - OCP클러스터 內 Prometheus 주7) 를 활용하여 클러스터 상태, 노드 리소스 등 모니터링\n모니터링 | 실시간 MSA 거래 추적 기능 적용 | - Service Mesh(istio)주9)를 적용하여 Kiali 주10), Jaeger주11)를 통한 서비스 트래픽 및 성능 모니터링 시각화\n시스템 연계 | 외부 연계시 내부API  G/W, EAI 활용 | - 코어뱅킹(상품 처리계 등), 금융복합플랫폼 연계시 전행표준인 내부API G/W or EAI를 통해 연계",
+    "doc_key": "구축요건정의서.v.1",
+    "doc_version": "1"
+  },
+  {
+    "requirement_id": "REQ-0003",
+    "category": "비기능",
+    "requirement_name": "시스템 모니터링",
+    "requirement_type": "비기능요구사항",
+    "domain": "모니터링",
+    "feature": "클러스터 모니터링",
+    "description": "OCP클러스터 내 Prometheus를 활용하여 클러스터 상태 및 노드 리소스 모니터링",
+    "note": "운영 모니터링",
+    "source_doc": "구축요건정의서.v.1.docx",
+    "source_chunk_id": "a598808c491dcdcc",
+    "source_section_path": [
+      "ROOT"
+    ],
+    "raw_text": "2.3.3 개발 상세 내용\n- 비대면 아키텍쳐 재설계 및 인프라 구축\n기능구분 | 주요내용 | 상세\n아키텍쳐 설계 | 시스템 아키텍쳐 설계 | - 서비스별 독립성, 확장 유연성을 가질 수 있는 OCP 플랫폼 구축 - 기존 화면 액션(JSP) 및 업무 개발영역(JAVA)을 PaaS 로 설계\n아키텍쳐 설계 | 대용량 아키텍쳐 설계 | - 대용량 수용가능 아키텍처 필요하며 시스템 사용자 증가에 대비한 아키텍쳐 설계\n모니터링 | 시스템 모니터링 | - OCP클러스터 內 Prometheus 주7) 를 활용하여 클러스터 상태, 노드 리소스 등 모니터링\n모니터링 | 실시간 MSA 거래 추적 기능 적용 | - Service Mesh(istio)주9)를 적용하여 Kiali 주10), Jaeger주11)를 통한 서비스 트래픽 및 성능 모니터링 시각화\n시스템 연계 | 외부 연계시 내부API  G/W, EAI 활용 | - 코어뱅킹(상품 처리계 등), 금융복합플랫폼 연계시 전행표준인 내부API G/W or EAI를 통해 연계",
+    "doc_key": "구축요건정의서.v.1",
+    "doc_version": "1"
+  },
+  {
+    "requirement_id": "REQ-0004",
+    "category": "비기능",
+    "requirement_name": "실시간 MSA 거래 추적",
+    "requirement_type": "비기능요구사항",
+    "domain": "모니터링",
+    "feature": "서비스 트래픽 모니터링",
+    "description": "Service Mesh(istio) 적용으로 Kiali, Jaeger를 통한 서비스 트래픽 및 성능 모니터링 시각화",
+    "note": "MSA 성능 추적",
+    "source_doc": "구축요건정의서.v.1.docx",
+    "source_chunk_id": "a598808c491dcdcc",
+    "source_section_path": [
+      "ROOT"
+    ],
+    "raw_text": "2.3.3 개발 상세 내용\n- 비대면 아키텍쳐 재설계 및 인프라 구축\n기능구분 | 주요내용 | 상세\n아키텍쳐 설계 | 시스템 아키텍쳐 설계 | - 서비스별 독립성, 확장 유연성을 가질 수 있는 OCP 플랫폼 구축 - 기존 화면 액션(JSP) 및 업무 개발영역(JAVA)을 PaaS 로 설계\n아키텍쳐 설계 | 대용량 아키텍쳐 설계 | - 대용량 수용가능 아키텍처 필요하며 시스템 사용자 증가에 대비한 아키텍쳐 설계\n모니터링 | 시스템 모니터링 | - OCP클러스터 內 Prometheus 주7) 를 활용하여 클러스터 상태, 노드 리소스 등 모니터링\n모니터링 | 실시간 MSA 거래 추적 기능 적용 | - Service Mesh(istio)주9)를 적용하여 Kiali 주10), Jaeger주11)를 통한 서비스 트래픽 및 성능 모니터링 시각화\n시스템 연계 | 외부 연계시 내부API  G/W, EAI 활용 | - 코어뱅킹(상품 처리계 등), 금융복합플랫폼 연계시 전행표준인 내부API G/W or EAI를 통해 연계",
+    "doc_key": "구축요건정의서.v.1",
+    "doc_version": "1"
+  },
+  {
+    "requirement_id": "REQ-0005",
+    "category": "인터페이스",
+    "requirement_name": "외부 시스템 연계",
+    "requirement_type": "기능요구사항",
+    "domain": "시스템 연계",
+    "feature": "API 게이트웨이 연계",
+    "description": "코어뱅킹, 금융복합플랫폼 연계시 전행표준인 내부API G/W 또는 EAI를 통한 연계",
+    "note": "표준 연계 방식",
+    "source_doc": "구축요건정의서.v.1.docx",
+    "source_chunk_id": "a598808c491dcdcc",
+    "source_section_path": [
+      "ROOT"
+    ],
+    "raw_text": "2.3.3 개발 상세 내용\n- 비대면 아키텍쳐 재설계 및 인프라 구축\n기능구분 | 주요내용 | 상세\n아키텍쳐 설계 | 시스템 아키텍쳐 설계 | - 서비스별 독립성, 확장 유연성을 가질 수 있는 OCP 플랫폼 구축 - 기존 화면 액션(JSP) 및 업무 개발영역(JAVA)을 PaaS 로 설계\n아키텍쳐 설계 | 대용량 아키텍쳐 설계 | - 대용량 수용가능 아키텍처 필요하며 시스템 사용자 증가에 대비한 아키텍쳐 설계\n모니터링 | 시스템 모니터링 | - OCP클러스터 內 Prometheus 주7) 를 활용하여 클러스터 상태, 노드 리소스 등 모니터링\n모니터링 | 실시간 MSA 거래 추적 기능 적용 | - Service Mesh(istio)주9)를 적용하여 Kiali 주10), Jaeger주11)를 통한 서비스 트래픽 및 성능 모니터링 시각화\n시스템 연계 | 외부 연계시 내부API  G/W, EAI 활용 | - 코어뱅킹(상품 처리계 등), 금융복합플랫폼 연계시 전행표준인 내부API G/W or EAI를 통해 연계",
+    "doc_key": "구축요건정의서.v.1",
+    "doc_version": "1"
+  }
+]
